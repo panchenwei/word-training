@@ -2237,18 +2237,26 @@
     function loadProgress() { try { const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); return saved && typeof saved === 'object' ? saved : {}; } catch { return {}; } }
     let progress = loadProgress();
     function saveProgress() { localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); }
+    function progressSummary(source = progress) {
+      const values = Object.values(source).map(value => Math.min(2, Math.max(0, Number(value) || 0)));
+      return {
+        passed: values.filter(value => value >= 2).length,
+        half: values.filter(value => value === 1).length
+      };
+    }
     function showSyncNote(message) {
       const note = document.getElementById('syncNote');
       note.textContent = message;
       clearTimeout(showSyncNote.timer);
-      showSyncNote.timer = setTimeout(() => { note.textContent = ''; }, 4200);
+      showSyncNote.timer = setTimeout(() => { note.textContent = ''; }, 8000);
     }
     function encodeProgressCode() {
       const payload = { app: 'ielts-listening-spelling', version: 2, savedAt: new Date().toISOString(), progress };
       return btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
     }
     function decodeProgressCode(code) {
-      const payload = JSON.parse(decodeURIComponent(escape(atob(code.trim()))));
+      const cleanCode = code.trim().replace(/\s+/g, '');
+      const payload = JSON.parse(decodeURIComponent(escape(atob(cleanCode))));
       if (!payload || payload.app !== 'ielts-listening-spelling' || payload.version !== 2 || !payload.progress || typeof payload.progress !== 'object') {
         throw new Error('invalid progress code');
       }
@@ -2301,12 +2309,13 @@
     document.getElementById('shuffleBtn').addEventListener('click', () => { shuffleArray(localOrder[activeGroup]); pickNext(true); render(); });
     document.getElementById('exportBtn').addEventListener('click', async () => {
       const code = encodeProgressCode();
+      const summary = progressSummary();
       try {
         await navigator.clipboard.writeText(code);
-        showSyncNote('进度码已复制，去另一台设备点“导入进度”粘贴即可。');
+        showSyncNote(`进度码已复制：已过 ${summary.passed} 个，半过 ${summary.half} 个。`);
       } catch {
         prompt('复制下面这段进度码，到另一台设备导入：', code);
-        showSyncNote('如果没有自动复制，请手动复制弹窗里的进度码。');
+        showSyncNote(`请手动复制弹窗里的进度码：已过 ${summary.passed} 个，半过 ${summary.half} 个。`);
       }
     });
     document.getElementById('importBtn').addEventListener('click', () => {
@@ -2314,12 +2323,15 @@
       if (!code) return;
       try {
         progress = decodeProgressCode(code);
+        const summary = progressSummary(progress);
         saveProgress();
         currentItem = null;
         pickNext(true);
         render();
-        showSyncNote('进度已导入。');
+        alert(`进度已导入：已过 ${summary.passed} 个，半过 ${summary.half} 个。`);
+        showSyncNote(`进度已导入：已过 ${summary.passed} 个，半过 ${summary.half} 个。`);
       } catch {
+        alert('导入失败：进度码格式不对。请确认复制的是完整进度码。');
         showSyncNote('导入失败：进度码格式不对。');
       }
     });
