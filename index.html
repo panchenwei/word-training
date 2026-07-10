@@ -2229,7 +2229,7 @@
     ]
   }
 ];
-    const TEXT = {"page": "听力错词拼写闯关", "headline": "听力错词<br>拼写闯关", "subtitle": "只看中文，拼英文。每个词完整拼对两次才过关；组内顺序已打乱。", "words": "词", "passed": "已过", "per_group": "每组 50 个", "group1": "第1组", "shuffle": "重新打乱本组", "reset_group": "重置本组", "reset_all": "清空全部进度", "input": "输入英文完整拼写", "submit": "提交", "done_title": "本组已过关", "done_desc": "这一组所有词都已经完整拼对两次，可以切下一组了。", "current": "当前词进度", "ok_done": "正确，已过关。", "ok_once": "正确，还需要再拼对 1 次。", "bad": "拼错了，本轮不计，换下一个。", "confirm": "确定清空全部拼写进度吗？"};
+    const TEXT = {"page": "听力错词拼写闯关", "headline": "听力错词<br>拼写闯关", "subtitle": "只看中文，拼英文。每个词完整拼对两次才过关；组内顺序已打乱。", "words": "词", "passed": "已过", "per_group": "每组 50 个", "group1": "第1组", "shuffle": "重新打乱本组", "reset_group": "重置本组", "reset_all": "清空全部进度", "input": "输入英文完整拼写", "submit": "提交", "done_title": "本组已过关", "done_desc": "这一组所有词都已经完整拼对两次，可以切下一组了。", "current": "当前词进度", "ok_done": "正确，已过关。", "ok_once": "正确，还需要再拼对 1 次。", "bad": "拼错了，本轮不计。", "answer": "正确答案", "next": "下一题", "confirm": "确定清空全部拼写进度吗？"};
     const STORAGE_KEY = 'ielts-listening-spelling-progress-v2';
     let activeGroup = 0;
     let currentItem = null;
@@ -2289,7 +2289,12 @@
       document.getElementById('answerForm').addEventListener('submit', event => {
         event.preventDefault(); const feedback = document.getElementById('feedback'); const answer = normalizeAnswer(input.value);
         if (answer === currentItem.english) { const nextCount = countOf(activeGroup, currentItem.index) + 1; setCount(activeGroup, currentItem.index, nextCount); feedback.textContent = nextCount >= 2 ? TEXT.ok_done : TEXT.ok_once; feedback.className = 'feedback ok'; input.value = ''; setTimeout(() => { pickNext(true); render(); }, 420); }
-        else { feedback.textContent = TEXT.bad; feedback.className = 'feedback bad'; input.disabled = true; setTimeout(() => { pickNext(true); render(); }, 650); }
+        else {
+          feedback.innerHTML = `${TEXT.bad}<br>${TEXT.answer}：<strong>${currentItem.english}</strong><br><button class="soft-btn" id="nextAfterWrong" type="button">${TEXT.next}</button>`;
+          feedback.className = 'feedback bad';
+          input.disabled = true;
+          document.getElementById('nextAfterWrong').addEventListener('click', () => { pickNext(true); render(); });
+        }
       });
     }
     function render() { renderGroups(); renderQuiz(); }
