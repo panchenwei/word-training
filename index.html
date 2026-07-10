@@ -1,0 +1,2326 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>听力错词拼写闯关</title>
+  <style>
+    :root { --ink:#17211b; --muted:#68746d; --card:rgba(255,255,255,.78); --line:rgba(23,33,27,.13); --green:#1e7f56; --green-dark:#12583b; --red:#be3b3b; --shadow:0 24px 70px rgba(44,64,51,.16); }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; font-family:"Segoe UI","Microsoft YaHei",sans-serif; color:var(--ink); background:radial-gradient(circle at 12% 8%,rgba(255,196,112,.38),transparent 28rem),radial-gradient(circle at 88% 12%,rgba(95,168,121,.28),transparent 26rem),linear-gradient(135deg,#f8f1dc 0%,#eef5e8 48%,#fffaf0 100%); }
+    .shell { width:min(1180px,calc(100% - 32px)); margin:0 auto; padding:36px 0 44px; }
+    header { display:flex; justify-content:space-between; gap:24px; align-items:flex-end; margin-bottom:22px; }
+    h1 { margin:0; font-size:clamp(32px,5vw,60px); letter-spacing:-.05em; line-height:.96; }
+    .subtitle { margin:12px 0 0; color:var(--muted); font-size:16px; }
+    .stats { display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    .pill { padding:10px 14px; border:1px solid var(--line); border-radius:999px; background:rgba(255,255,255,.52); color:var(--muted); font-size:14px; backdrop-filter:blur(10px); }
+    .layout { display:grid; grid-template-columns:300px 1fr; gap:22px; align-items:start; }
+    .panel,.card { background:var(--card); border:1px solid var(--line); border-radius:28px; box-shadow:var(--shadow); backdrop-filter:blur(18px); }
+    .panel { padding:16px; position:sticky; top:16px; }
+    .group-list { display:grid; gap:10px; }
+    .group-btn { width:100%; border:1px solid transparent; border-radius:18px; padding:14px; background:rgba(255,255,255,.56); text-align:left; cursor:pointer; color:var(--ink); transition:160ms ease; }
+    .group-btn:hover { transform:translateY(-1px); border-color:rgba(30,127,86,.32); }
+    .group-btn.active { background:#173f2d; color:white; }
+    .group-btn.done { border-color:rgba(30,127,86,.42); }
+    .group-title { display:flex; justify-content:space-between; gap:10px; font-weight:700; }
+    .group-progress { margin-top:8px; height:8px; overflow:hidden; border-radius:999px; background:rgba(23,33,27,.1); }
+    .group-progress span { display:block; height:100%; background:linear-gradient(90deg,#56b378,#1e7f56); }
+    .card { padding:clamp(22px,4vw,40px); min-height:560px; }
+    .toolbar { display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:28px; flex-wrap:wrap; }
+    .badge { color:var(--green-dark); background:rgba(30,127,86,.1); border:1px solid rgba(30,127,86,.18); padding:9px 12px; border-radius:999px; font-weight:700; }
+    .mini-actions { display:flex; gap:10px; flex-wrap:wrap; }
+    button { font:inherit; }
+    .soft-btn { border:1px solid var(--line); background:rgba(255,255,255,.65); color:var(--ink); border-radius:999px; padding:10px 14px; cursor:pointer; }
+    .soft-btn:hover { border-color:rgba(30,127,86,.38); }
+    .sync-note { width:100%; min-height:22px; color:var(--muted); font-size:13px; text-align:right; }
+    .question { display:grid; gap:18px; place-items:center; text-align:center; padding:44px 12px 34px; }
+    .zh { font-size:clamp(42px,7vw,84px); font-weight:900; letter-spacing:-.04em; line-height:1.08; }
+    .count { color:var(--muted); }
+    .input-row { display:flex; width:min(720px,100%); gap:12px; margin:0 auto; }
+    input { flex:1; border:2px solid rgba(23,33,27,.13); border-radius:22px; padding:18px 20px; font-size:24px; outline:none; background:rgba(255,255,255,.85); color:var(--ink); }
+    input:focus { border-color:rgba(30,127,86,.58); box-shadow:0 0 0 5px rgba(30,127,86,.1); }
+    .submit { border:0; border-radius:22px; padding:0 28px; background:var(--green); color:white; font-weight:900; cursor:pointer; }
+    .submit:hover { background:var(--green-dark); }
+    .feedback { min-height:28px; text-align:center; margin-top:14px; font-weight:800; }
+    .feedback.ok { color:var(--green); } .feedback.bad { color:var(--red); }
+    .progress-strip { margin-top:32px; }
+    .bar { height:16px; border-radius:999px; background:rgba(23,33,27,.1); overflow:hidden; }
+    .bar span { display:block; height:100%; background:linear-gradient(90deg,#ffb85c,#1e7f56); transition:width 260ms ease; }
+    .word-grid { margin-top:18px; display:grid; grid-template-columns:repeat(auto-fill,minmax(44px,1fr)); gap:8px; }
+    .dot { height:34px; border-radius:12px; display:grid; place-items:center; font-size:13px; color:var(--muted); background:rgba(255,255,255,.58); border:1px solid var(--line); }
+    .dot.one { color:#9b5c18; border-color:rgba(215,119,47,.35); background:rgba(255,184,92,.16); }
+    .dot.two { color:white; border-color:transparent; background:var(--green); }
+    .empty { padding:80px 20px; text-align:center; color:var(--muted); }
+    @media (max-width:860px) { header { align-items:flex-start; flex-direction:column; } .stats { justify-content:flex-start; } .layout { grid-template-columns:1fr; } .panel { position:static; } .input-row { flex-direction:column; } .submit { padding:16px 18px; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div><h1>听力错词<br>拼写闯关</h1><p class="subtitle">只看中文，拼英文。每个词完整拼对两次才过关；组内顺序已打乱。</p></div>
+      <div class="stats"><div class="pill" id="totalStat">523 词</div><div class="pill" id="doneStat">已过 0</div><div class="pill">每组 50 个</div></div>
+    </header>
+    <section class="layout">
+      <aside class="panel"><div class="group-list" id="groupList"></div></aside>
+      <section class="card">
+        <div class="toolbar"><div class="badge" id="activeTitle">第1组</div><div class="mini-actions"><button class="soft-btn" id="shuffleBtn" type="button">重新打乱本组</button><button class="soft-btn" id="exportBtn" type="button">导出进度</button><button class="soft-btn" id="importBtn" type="button">导入进度</button><button class="soft-btn" id="resetGroupBtn" type="button">重置本组</button><button class="soft-btn" id="resetAllBtn" type="button">清空全部进度</button><div class="sync-note" id="syncNote"></div></div></div>
+        <div id="quizArea"></div>
+      </section>
+    </section>
+  </main>
+  <script>
+    const GROUPS = [
+  {
+    "id": 0,
+    "title": "第1组（1-50）",
+    "items": [
+      {
+        "english": "city tour",
+        "chinese": "城市观光"
+      },
+      {
+        "english": "air conditioner",
+        "chinese": "空调"
+      },
+      {
+        "english": "local cuisine",
+        "chinese": "本地美食"
+      },
+      {
+        "english": "currency exchange",
+        "chinese": "货币兑换"
+      },
+      {
+        "english": "immigration",
+        "chinese": "出入境检查"
+      },
+      {
+        "english": "self-guided tour",
+        "chinese": "自助游"
+      },
+      {
+        "english": "double bedroom",
+        "chinese": "双人卧室"
+      },
+      {
+        "english": "check-in",
+        "chinese": "办理入住"
+      },
+      {
+        "english": "wine tasting",
+        "chinese": "品酒"
+      },
+      {
+        "english": "deposit",
+        "chinese": "押金"
+      },
+      {
+        "english": "travel expenses",
+        "chinese": "旅行开支"
+      },
+      {
+        "english": "campsite",
+        "chinese": "露营地"
+      },
+      {
+        "english": "cable car",
+        "chinese": "缆车"
+      },
+      {
+        "english": "bathroom",
+        "chinese": "浴室"
+      },
+      {
+        "english": "ferry",
+        "chinese": "渡轮"
+      },
+      {
+        "english": "dining room",
+        "chinese": "餐厅"
+      },
+      {
+        "english": "landmark",
+        "chinese": "地标"
+      },
+      {
+        "english": "balcony",
+        "chinese": "阳台"
+      },
+      {
+        "english": "sightseeing",
+        "chinese": "观光"
+      },
+      {
+        "english": "surfing",
+        "chinese": "冲浪"
+      },
+      {
+        "english": "permanent",
+        "chinese": "永久的"
+      },
+      {
+        "english": "travel document",
+        "chinese": "旅行证件"
+      },
+      {
+        "english": "self-drive tour",
+        "chinese": "自驾游"
+      },
+      {
+        "english": "bicycle",
+        "chinese": "自行车"
+      },
+      {
+        "english": "cruise",
+        "chinese": "邮轮旅行"
+      },
+      {
+        "english": "booking accommodation",
+        "chinese": "住宿"
+      },
+      {
+        "english": "itinerary",
+        "chinese": "行程安排"
+      },
+      {
+        "english": "travel insurance",
+        "chinese": "旅行保险"
+      },
+      {
+        "english": "nightlife",
+        "chinese": "夜生活"
+      },
+      {
+        "english": "places of interest",
+        "chinese": "名胜"
+      },
+      {
+        "english": "temporary",
+        "chinese": "临时的"
+      },
+      {
+        "english": "check-out",
+        "chinese": "办理退房"
+      },
+      {
+        "english": "drone",
+        "chinese": "无人机"
+      },
+      {
+        "english": "water heater",
+        "chinese": "热水器"
+      },
+      {
+        "english": "entertainment",
+        "chinese": "娱乐"
+      },
+      {
+        "english": "cultural tourism",
+        "chinese": "文化旅游"
+      },
+      {
+        "english": "washing machine",
+        "chinese": "洗衣机"
+      },
+      {
+        "english": "tour guide",
+        "chinese": "导游"
+      },
+      {
+        "english": "shopping",
+        "chinese": "购物"
+      },
+      {
+        "english": "navigation",
+        "chinese": "导航"
+      },
+      {
+        "english": "business class",
+        "chinese": "商务舱"
+      },
+      {
+        "english": "cupboard",
+        "chinese": "碗柜"
+      },
+      {
+        "english": "central heating",
+        "chinese": "中央供暖"
+      },
+      {
+        "english": "vegetarian",
+        "chinese": "素食者；素食的"
+      },
+      {
+        "english": "guesthouse",
+        "chinese": "家庭旅馆"
+      },
+      {
+        "english": "backpacking",
+        "chinese": "背包旅行"
+      },
+      {
+        "english": "customer service",
+        "chinese": "客户服务"
+      },
+      {
+        "english": "bulb",
+        "chinese": "灯泡"
+      },
+      {
+        "english": "local market",
+        "chinese": "本地市场"
+      },
+      {
+        "english": "economy class",
+        "chinese": "经济舱"
+      }
+    ]
+  },
+  {
+    "id": 1,
+    "title": "第2组（51-100）",
+    "items": [
+      {
+        "english": "freight",
+        "chinese": "货物、货运"
+      },
+      {
+        "english": "flashlight",
+        "chinese": "手电筒"
+      },
+      {
+        "english": "luggage",
+        "chinese": "行李"
+      },
+      {
+        "english": "departure lounge",
+        "chinese": "候机厅"
+      },
+      {
+        "english": "theatre",
+        "chinese": "剧院"
+      },
+      {
+        "english": "jogging",
+        "chinese": "慢跑"
+      },
+      {
+        "english": "amateur",
+        "chinese": "业余的；业余爱好者"
+      },
+      {
+        "english": "phrases travel plan",
+        "chinese": "旅行计划"
+      },
+      {
+        "english": "vlog",
+        "chinese": "视频博客"
+      },
+      {
+        "english": "guidebook",
+        "chinese": "旅行指南"
+      },
+      {
+        "english": "beach volleyball",
+        "chinese": "沙滩排球"
+      },
+      {
+        "english": "travel adapter",
+        "chinese": "旅行转换插头"
+      },
+      {
+        "english": "documentary",
+        "chinese": "纪录片"
+      },
+      {
+        "english": "check-in counter",
+        "chinese": "值机柜台"
+      },
+      {
+        "english": "concert hall",
+        "chinese": "音乐厅"
+      },
+      {
+        "english": "heritage site",
+        "chinese": "遗产地"
+      },
+      {
+        "english": "schedule",
+        "chinese": "日程表"
+      },
+      {
+        "english": "bungee jumping",
+        "chinese": "蹦极"
+      },
+      {
+        "english": "kayaking",
+        "chinese": "皮划艇"
+      },
+      {
+        "english": "frisbee",
+        "chinese": "飞盘"
+      },
+      {
+        "english": "travel forum",
+        "chinese": "旅行论坛"
+      },
+      {
+        "english": "marathon",
+        "chinese": "马拉松"
+      },
+      {
+        "english": "umbrella",
+        "chinese": "雨伞"
+      },
+      {
+        "english": "boarding pass",
+        "chinese": "登机牌"
+      },
+      {
+        "english": "statue",
+        "chinese": "雕像"
+      },
+      {
+        "english": "sculpture",
+        "chinese": "雕塑"
+      },
+      {
+        "english": "audience",
+        "chinese": "观众"
+      },
+      {
+        "english": "torch",
+        "chinese": "手电筒"
+      },
+      {
+        "english": "opera house",
+        "chinese": "歌剧院"
+      },
+      {
+        "english": "palace",
+        "chinese": "宫殿"
+      },
+      {
+        "english": "souvenir",
+        "chinese": "纪念品"
+      },
+      {
+        "english": "brochure",
+        "chinese": "宣传册"
+      },
+      {
+        "english": "blog",
+        "chinese": "博客"
+      },
+      {
+        "english": "water-skiing",
+        "chinese": "滑水"
+      },
+      {
+        "english": "temple",
+        "chinese": "寺庙"
+      },
+      {
+        "english": "skiing",
+        "chinese": "滑雪"
+      },
+      {
+        "english": "baggage",
+        "chinese": "行李"
+      },
+      {
+        "english": "cycling",
+        "chinese": "骑行"
+      },
+      {
+        "english": "aboriginal park",
+        "chinese": "原住民公园"
+      },
+      {
+        "english": "archery",
+        "chinese": "射箭"
+      },
+      {
+        "english": "rock climbing",
+        "chinese": "攀岩"
+      },
+      {
+        "english": "half marathon",
+        "chinese": "半程马拉松"
+      },
+      {
+        "english": "travel companion",
+        "chinese": "旅伴"
+      },
+      {
+        "english": "photography",
+        "chinese": "摄影"
+      },
+      {
+        "english": "scuba diving",
+        "chinese": "水肺潜水"
+      },
+      {
+        "english": "cricket",
+        "chinese": "板球"
+      },
+      {
+        "english": "aquarium",
+        "chinese": "水族馆"
+      },
+      {
+        "english": "itinerary planning",
+        "chinese": "行程规划"
+      },
+      {
+        "english": "botanic park",
+        "chinese": "植物园"
+      },
+      {
+        "english": "horseback riding",
+        "chinese": "骑马"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "第3组（101-150）",
+    "items": [
+      {
+        "english": "picnic",
+        "chinese": "野餐"
+      },
+      {
+        "english": "acupuncture",
+        "chinese": "针灸"
+      },
+      {
+        "english": "paragliding",
+        "chinese": "滑翔伞"
+      },
+      {
+        "english": "skiing",
+        "chinese": "滑雪"
+      },
+      {
+        "english": "jewelry making",
+        "chinese": "珠宝制作"
+      },
+      {
+        "english": "massage",
+        "chinese": "按摩"
+      },
+      {
+        "english": "zip lining",
+        "chinese": "高空滑索"
+      },
+      {
+        "english": "theatre",
+        "chinese": "戏剧"
+      },
+      {
+        "english": "museum visit",
+        "chinese": "参观博物馆"
+      },
+      {
+        "english": "cultural event",
+        "chinese": "文化活动"
+      },
+      {
+        "english": "martial arts",
+        "chinese": "武术"
+      },
+      {
+        "english": "rowing",
+        "chinese": "赛艇/划船"
+      },
+      {
+        "english": "squash",
+        "chinese": "壁球"
+      },
+      {
+        "english": "snowboarding",
+        "chinese": "单板滑雪"
+      },
+      {
+        "english": "gardening",
+        "chinese": "园艺"
+      },
+      {
+        "english": "learning art exhibition",
+        "chinese": "艺术展览"
+      },
+      {
+        "english": "table tennis",
+        "chinese": "乒乓球"
+      },
+      {
+        "english": "triathlon",
+        "chinese": "铁人三项"
+      },
+      {
+        "english": "spa day",
+        "chinese": "水疗日"
+      },
+      {
+        "english": "rugby",
+        "chinese": "橄榄球"
+      },
+      {
+        "english": "craft fair",
+        "chinese": "手工艺品集市"
+      },
+      {
+        "english": "parade",
+        "chinese": "游行"
+      },
+      {
+        "english": "video games",
+        "chinese": "电子游戏"
+      },
+      {
+        "english": "wellness retreat",
+        "chinese": "健康疗养"
+      },
+      {
+        "english": "pilates",
+        "chinese": "普拉提"
+      },
+      {
+        "english": "volleyball",
+        "chinese": "排球"
+      },
+      {
+        "english": "photography",
+        "chinese": "摄影"
+      },
+      {
+        "english": "soccer",
+        "chinese": "足球"
+      },
+      {
+        "english": "meditation",
+        "chinese": "冥想"
+      },
+      {
+        "english": "outdoor yoga",
+        "chinese": "户外瑜伽"
+      },
+      {
+        "english": "dance performance",
+        "chinese": "舞蹈表演"
+      },
+      {
+        "english": "mountaineering",
+        "chinese": "登山"
+      },
+      {
+        "english": "street performance",
+        "chinese": "街头表演"
+      },
+      {
+        "english": "trail running",
+        "chinese": "越野跑"
+      },
+      {
+        "english": "aerobics",
+        "chinese": "有氧运动"
+      },
+      {
+        "english": "workshop",
+        "chinese": "实践工作坊"
+      },
+      {
+        "english": "trivia night",
+        "chinese": "知识竞赛夜"
+      },
+      {
+        "english": "culinary tour",
+        "chinese": "美食之旅"
+      },
+      {
+        "english": "skydiving",
+        "chinese": "跳伞"
+      },
+      {
+        "english": "obstacle course",
+        "chinese": "障碍赛"
+      },
+      {
+        "english": "film screening",
+        "chinese": "电影放映"
+      },
+      {
+        "english": "theatre",
+        "chinese": "戏剧"
+      },
+      {
+        "english": "practical crafting",
+        "chinese": "手工艺制作"
+      },
+      {
+        "english": "orienteering",
+        "chinese": "定向越野"
+      },
+      {
+        "english": "fair",
+        "chinese": "集市/展会"
+      },
+      {
+        "english": "bird watching",
+        "chinese": "观鸟"
+      },
+      {
+        "english": "swimming",
+        "chinese": "游泳"
+      },
+      {
+        "english": "game night",
+        "chinese": "游戏之夜"
+      },
+      {
+        "english": "paintball",
+        "chinese": "彩弹射击"
+      },
+      {
+        "english": "baking class",
+        "chinese": "烘焙课"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "第4组（151-200）",
+    "items": [
+      {
+        "english": "volunteer work",
+        "chinese": "志愿者工作"
+      },
+      {
+        "english": "fundraising",
+        "chinese": "募捐活动"
+      },
+      {
+        "english": "pottery",
+        "chinese": "陶艺"
+      },
+      {
+        "english": "wine tasting",
+        "chinese": "品酒会"
+      },
+      {
+        "english": "campaign",
+        "chinese": "(公益)宣传活动"
+      },
+      {
+        "english": "lobby",
+        "chinese": "大厅"
+      },
+      {
+        "english": "animal rescue",
+        "chinese": "动物救助"
+      },
+      {
+        "english": "professional",
+        "chinese": "专业的"
+      },
+      {
+        "english": "self-employed",
+        "chinese": "个体经营者"
+      },
+      {
+        "english": "application",
+        "chinese": "申请"
+      },
+      {
+        "english": "job seeker",
+        "chinese": "求职者"
+      },
+      {
+        "english": "check-out",
+        "chinese": "办理借阅"
+      },
+      {
+        "english": "flashlight",
+        "chinese": "手电筒"
+      },
+      {
+        "english": "market headhunter",
+        "chinese": "猎头"
+      },
+      {
+        "english": "community community service",
+        "chinese": "社区服务"
+      },
+      {
+        "english": "laboratory",
+        "chinese": "实验室"
+      },
+      {
+        "english": "promotion",
+        "chinese": "晋升"
+      },
+      {
+        "english": "knitting",
+        "chinese": "编织"
+      },
+      {
+        "english": "employee",
+        "chinese": "雇员"
+      },
+      {
+        "english": "job portal",
+        "chinese": "求职网站"
+      },
+      {
+        "english": "open shelves",
+        "chinese": "开架书库"
+      },
+      {
+        "english": "contract",
+        "chinese": "合同"
+      },
+      {
+        "english": "application form",
+        "chinese": "申请表"
+      },
+      {
+        "english": "helmet",
+        "chinese": "头盔"
+      },
+      {
+        "english": "sandals",
+        "chinese": "凉鞋"
+      },
+      {
+        "english": "retirement",
+        "chinese": "退休"
+      },
+      {
+        "english": "probation period",
+        "chinese": "试用期"
+      },
+      {
+        "english": "performance evaluation",
+        "chinese": "绩效评估"
+      },
+      {
+        "english": "vacancy",
+        "chinese": "职位空缺"
+      },
+      {
+        "english": "sunglasses",
+        "chinese": "太阳镜"
+      },
+      {
+        "english": "health fair",
+        "chinese": "健康咨询会"
+      },
+      {
+        "english": "pay rise",
+        "chinese": "加薪"
+      },
+      {
+        "english": "closed shelves",
+        "chinese": "闭架书库"
+      },
+      {
+        "english": "internship",
+        "chinese": "实习"
+      },
+      {
+        "english": "part-time",
+        "chinese": "兼职"
+      },
+      {
+        "english": "cv (curriculum vitae)",
+        "chinese": "简历"
+      },
+      {
+        "english": "bookshelf",
+        "chinese": "书架"
+      },
+      {
+        "english": "fine",
+        "chinese": "罚款"
+      },
+      {
+        "english": "loan time",
+        "chinese": "借阅期限"
+      },
+      {
+        "english": "well-paid",
+        "chinese": "待遇优厚的"
+      },
+      {
+        "english": "cover letter",
+        "chinese": "求职信"
+      },
+      {
+        "english": "woodworking",
+        "chinese": "木工"
+      },
+      {
+        "english": "mosquito net",
+        "chinese": "蚊帐"
+      },
+      {
+        "english": "full-time",
+        "chinese": "全职"
+      },
+      {
+        "english": "job application",
+        "chinese": "求职申请"
+      },
+      {
+        "english": "overdue",
+        "chinese": "逾期"
+      },
+      {
+        "english": "fill out",
+        "chinese": "填写"
+      },
+      {
+        "english": "torch",
+        "chinese": "手电筒"
+      },
+      {
+        "english": "workload",
+        "chinese": "工作量"
+      },
+      {
+        "english": "reference",
+        "chinese": "推荐信"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "title": "第5组（201-250）",
+    "items": [
+      {
+        "english": "services financial advisor",
+        "chinese": "理财顾问"
+      },
+      {
+        "english": "assessment",
+        "chinese": "评估"
+      },
+      {
+        "english": "date slip",
+        "chinese": "期限条"
+      },
+      {
+        "english": "consultant",
+        "chinese": "顾问"
+      },
+      {
+        "english": "expertise",
+        "chinese": "专业知识"
+      },
+      {
+        "english": "advice",
+        "chinese": "建议"
+      },
+      {
+        "english": "discussion",
+        "chinese": "讨论"
+      },
+      {
+        "english": "current issue",
+        "chinese": "现刊"
+      },
+      {
+        "english": "external member",
+        "chinese": "校外读者"
+      },
+      {
+        "english": "catalogue",
+        "chinese": "目录"
+      },
+      {
+        "english": "reference stacks",
+        "chinese": "参考书库"
+      },
+      {
+        "english": "worksheet",
+        "chinese": "活页练习题"
+      },
+      {
+        "english": "interest-bearing account",
+        "chinese": "计息账户"
+      },
+      {
+        "english": "inquiry",
+        "chinese": "问询"
+      },
+      {
+        "english": "fiction",
+        "chinese": "小说类"
+      },
+      {
+        "english": "out-of-date",
+        "chinese": "已过时的"
+      },
+      {
+        "english": "handout",
+        "chinese": "讲义"
+      },
+      {
+        "english": "query",
+        "chinese": "具体问题"
+      },
+      {
+        "english": "credit card",
+        "chinese": "信用卡"
+      },
+      {
+        "english": "advanced",
+        "chinese": "高级的"
+      },
+      {
+        "english": "mortgage",
+        "chinese": "按揭贷款"
+      },
+      {
+        "english": "video",
+        "chinese": "录像资料"
+      },
+      {
+        "english": "workbook",
+        "chinese": "练习册"
+      },
+      {
+        "english": "leaflet",
+        "chinese": "传单"
+      },
+      {
+        "english": "accessible",
+        "chinese": "可访问的"
+      },
+      {
+        "english": "intermediate",
+        "chinese": "中级的"
+      },
+      {
+        "english": "overdraft",
+        "chinese": "透支"
+      },
+      {
+        "english": "multimedia",
+        "chinese": "多媒体资源"
+      },
+      {
+        "english": "library card number",
+        "chinese": "借书证号"
+      },
+      {
+        "english": "safe deposit box",
+        "chinese": "保险箱"
+      },
+      {
+        "english": "resources article",
+        "chinese": "文章"
+      },
+      {
+        "english": "brochure",
+        "chinese": "小册子"
+      },
+      {
+        "english": "textbook",
+        "chinese": "教科书"
+      },
+      {
+        "english": "pin",
+        "chinese": "个人密码"
+      },
+      {
+        "english": "withdrawal",
+        "chinese": "取款"
+      },
+      {
+        "english": "manual",
+        "chinese": "手册"
+      },
+      {
+        "english": "consultation",
+        "chinese": "咨询"
+      },
+      {
+        "english": "engagement",
+        "chinese": "合作参与"
+      },
+      {
+        "english": "engagement alignment",
+        "chinese": "目标一致"
+      },
+      {
+        "english": "client satisfaction",
+        "chinese": "客户满意度"
+      },
+      {
+        "english": "collaboration",
+        "chinese": "协作"
+      },
+      {
+        "english": "course reserves",
+        "chinese": "课程指定阅读材料"
+      },
+      {
+        "english": "recommendation",
+        "chinese": "建议方案"
+      },
+      {
+        "english": "balance",
+        "chinese": "余额"
+      },
+      {
+        "english": "action plan",
+        "chinese": "行动计划"
+      },
+      {
+        "english": "reference materials",
+        "chinese": "参考资料"
+      },
+      {
+        "english": "bibliography",
+        "chinese": "参考文献目录"
+      },
+      {
+        "english": "self-access centre",
+        "chinese": "自习中心"
+      },
+      {
+        "english": "customer service",
+        "chinese": "客户服务"
+      },
+      {
+        "english": "periodical",
+        "chinese": "期刊"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "title": "第6组（251-300）",
+    "items": [
+      {
+        "english": "milestone",
+        "chinese": "里程碑"
+      },
+      {
+        "english": "noise control",
+        "chinese": "噪音控制"
+      },
+      {
+        "english": "cardiologist",
+        "chinese": "心脏病专家"
+      },
+      {
+        "english": "heat island",
+        "chinese": "热岛效应"
+      },
+      {
+        "english": "best practices",
+        "chinese": "最佳实践"
+      },
+      {
+        "english": "consultation fee",
+        "chinese": "咨询费"
+      },
+      {
+        "english": "mixed-use development",
+        "chinese": "综合开发项目"
+      },
+      {
+        "english": "cultural heritage",
+        "chinese": "文化遗产"
+      },
+      {
+        "english": "evaluation benchmarking",
+        "chinese": "对标分析"
+      },
+      {
+        "english": "resource management",
+        "chinese": "资源管理"
+      },
+      {
+        "english": "hospital",
+        "chinese": "医院"
+      },
+      {
+        "english": "urban governance",
+        "chinese": "城市治理"
+      },
+      {
+        "english": "feasibility study",
+        "chinese": "可行性研究"
+      },
+      {
+        "english": "urban habitat",
+        "chinese": "城市生境"
+      },
+      {
+        "english": "landscape",
+        "chinese": "景观"
+      },
+      {
+        "english": "construction demolition",
+        "chinese": "拆除"
+      },
+      {
+        "english": "governance public transportation",
+        "chinese": "公共交通"
+      },
+      {
+        "english": "brainstorming",
+        "chinese": "头脑风暴"
+      },
+      {
+        "english": "transit-oriented",
+        "chinese": "公交导向型"
+      },
+      {
+        "english": "agreements agreement",
+        "chinese": "协议"
+      },
+      {
+        "english": "civic engagement",
+        "chinese": "公众参与"
+      },
+      {
+        "english": "bicycle-friendly",
+        "chinese": "自行车友好型"
+      },
+      {
+        "english": "architecture",
+        "chinese": "建筑设计"
+      },
+      {
+        "english": "urban renewal",
+        "chinese": "城市更新"
+      },
+      {
+        "english": "public amenities",
+        "chinese": "公共便民设施"
+      },
+      {
+        "english": "zoning",
+        "chinese": "功能分区"
+      },
+      {
+        "english": "environment green space",
+        "chinese": "绿色空间"
+      },
+      {
+        "english": "walkability",
+        "chinese": "步行便利性"
+      },
+      {
+        "english": "market research",
+        "chinese": "市场调研"
+      },
+      {
+        "english": "doctor",
+        "chinese": "医生"
+      },
+      {
+        "english": "general practitioner",
+        "chinese": "全科医生"
+      },
+      {
+        "english": "public transportation",
+        "chinese": "公共交通"
+      },
+      {
+        "english": "clinic",
+        "chinese": "诊所"
+      },
+      {
+        "english": "scope",
+        "chinese": "范围"
+      },
+      {
+        "english": "facilitation",
+        "chinese": "引导/促成"
+      },
+      {
+        "english": "resource allocation",
+        "chinese": "资源分配"
+      },
+      {
+        "english": "cityscape",
+        "chinese": "城市风貌"
+      },
+      {
+        "english": "financial analysis",
+        "chinese": "财务分析"
+      },
+      {
+        "english": "adaptive reuse",
+        "chinese": "适应性再利用"
+      },
+      {
+        "english": "infrastructure",
+        "chinese": "基础设施"
+      },
+      {
+        "english": "social equity",
+        "chinese": "社会公平"
+      },
+      {
+        "english": "knowledge transfer",
+        "chinese": "知识转移"
+      },
+      {
+        "english": "strategic planning",
+        "chinese": "战略规划"
+      },
+      {
+        "english": "consultation room",
+        "chinese": "诊室"
+      },
+      {
+        "english": "deliver",
+        "chinese": "交付"
+      },
+      {
+        "english": "quality assurance",
+        "chinese": "质量保证"
+      },
+      {
+        "english": "follow-up",
+        "chinese": "后续跟进"
+      },
+      {
+        "english": "pedestrian zone",
+        "chinese": "步行区"
+      },
+      {
+        "english": "business plan",
+        "chinese": "商业计划书"
+      },
+      {
+        "english": "dermatologist",
+        "chinese": "皮肤科医生"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "title": "第7组（301-350）",
+    "items": [
+      {
+        "english": "dinosaur",
+        "chinese": "恐龙"
+      },
+      {
+        "english": "surgery",
+        "chinese": "外科手术"
+      },
+      {
+        "english": "psychiatrist",
+        "chinese": "精神科医生"
+      },
+      {
+        "english": "metabolic",
+        "chinese": "新陈代谢的"
+      },
+      {
+        "english": "chimpanzee",
+        "chinese": "黑猩猩"
+      },
+      {
+        "english": "consultation",
+        "chinese": "问诊"
+      },
+      {
+        "english": "paediatrician",
+        "chinese": "儿科医生"
+      },
+      {
+        "english": "physical therapy",
+        "chinese": "物理治疗"
+      },
+      {
+        "english": "inpatient",
+        "chinese": "住院病人"
+      },
+      {
+        "english": "healthcare",
+        "chinese": "医疗保健"
+      },
+      {
+        "english": "check-up",
+        "chinese": "健康检查"
+      },
+      {
+        "english": "ape",
+        "chinese": "猿"
+      },
+      {
+        "english": "serpent",
+        "chinese": "蛇"
+      },
+      {
+        "english": "crow",
+        "chinese": "乌鸦"
+      },
+      {
+        "english": "immune",
+        "chinese": "免疫的"
+      },
+      {
+        "english": "goose",
+        "chinese": "鹅"
+      },
+      {
+        "english": "snake",
+        "chinese": "蛇"
+      },
+      {
+        "english": "immunization",
+        "chinese": "免疫"
+      },
+      {
+        "english": "intensive care unit",
+        "chinese": "重症监护室"
+      },
+      {
+        "english": "pigeon",
+        "chinese": "鸽子"
+      },
+      {
+        "english": "outpatient",
+        "chinese": "门诊病人"
+      },
+      {
+        "english": "whale",
+        "chinese": "鲸"
+      },
+      {
+        "english": "squirrel",
+        "chinese": "松鼠"
+      },
+      {
+        "english": "crocodile",
+        "chinese": "鳄鱼"
+      },
+      {
+        "english": "dental care",
+        "chinese": "牙科护理"
+      },
+      {
+        "english": "mite",
+        "chinese": "螨虫"
+      },
+      {
+        "english": "amphibian",
+        "chinese": "两栖动物"
+      },
+      {
+        "english": "mammal",
+        "chinese": "哺乳动物"
+      },
+      {
+        "english": "anesthesia",
+        "chinese": "麻醉剂"
+      },
+      {
+        "english": "jellyfish",
+        "chinese": "水母"
+      },
+      {
+        "english": "dolphin",
+        "chinese": "海豚"
+      },
+      {
+        "english": "examination",
+        "chinese": "检查"
+      },
+      {
+        "english": "reptile",
+        "chinese": "爬行动物"
+      },
+      {
+        "english": "medical examination",
+        "chinese": "体检"
+      },
+      {
+        "english": "orangutan",
+        "chinese": "猩猩"
+      },
+      {
+        "english": "medical record",
+        "chinese": "病历"
+      },
+      {
+        "english": "symptoms acute illness",
+        "chinese": "急性病"
+      },
+      {
+        "english": "chronic disease",
+        "chinese": "慢性病"
+      },
+      {
+        "english": "healthcare provider",
+        "chinese": "医疗服务机构"
+      },
+      {
+        "english": "habitat",
+        "chinese": "栖息地"
+      },
+      {
+        "english": "lizard",
+        "chinese": "蜥蜴"
+      },
+      {
+        "english": "rehabilitation",
+        "chinese": "康复治疗"
+      },
+      {
+        "english": "pharmacy",
+        "chinese": "药房"
+      },
+      {
+        "english": "concepts anaesthesia",
+        "chinese": "麻醉剂"
+      },
+      {
+        "english": "cardiovascular disease",
+        "chinese": "心血管疾病"
+      },
+      {
+        "english": "worm",
+        "chinese": "蠕虫"
+      },
+      {
+        "english": "dragonfly",
+        "chinese": "蜻蜓"
+      },
+      {
+        "english": "lifespan",
+        "chinese": "寿命"
+      },
+      {
+        "english": "health insurance",
+        "chinese": "健康保险"
+      },
+      {
+        "english": "surgeon",
+        "chinese": "外科医生"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "title": "第8组（351-400）",
+    "items": [
+      {
+        "english": "teamwork",
+        "chinese": "团队合作"
+      },
+      {
+        "english": "species",
+        "chinese": "物种"
+      },
+      {
+        "english": "social responsibility",
+        "chinese": "社会责任"
+      },
+      {
+        "english": "peninsula",
+        "chinese": "半岛"
+      },
+      {
+        "english": "alternative",
+        "chinese": "替代方案"
+      },
+      {
+        "english": "budget",
+        "chinese": "预算"
+      },
+      {
+        "english": "personality",
+        "chinese": "个性"
+      },
+      {
+        "english": "equity",
+        "chinese": "股权/权益"
+      },
+      {
+        "english": "certificate",
+        "chinese": "证书"
+      },
+      {
+        "english": "plateau",
+        "chinese": "高原"
+      },
+      {
+        "english": "registration",
+        "chinese": "登记"
+      },
+      {
+        "english": "business plan",
+        "chinese": "商业计划"
+      },
+      {
+        "english": "strategy",
+        "chinese": "战略"
+      },
+      {
+        "english": "expenditure",
+        "chinese": "支出"
+      },
+      {
+        "english": "involved",
+        "chinese": "涉及的"
+      },
+      {
+        "english": "glacier",
+        "chinese": "冰川"
+      },
+      {
+        "english": "wildlife",
+        "chinese": "野生动物（总称）"
+      },
+      {
+        "english": "vacancy",
+        "chinese": "职位空缺"
+      },
+      {
+        "english": "customer service",
+        "chinese": "客户服务"
+      },
+      {
+        "english": "investment",
+        "chinese": "投资"
+      },
+      {
+        "english": "supplement",
+        "chinese": "补充"
+      },
+      {
+        "english": "administrative",
+        "chinese": "行政的"
+      },
+      {
+        "english": "shareholder",
+        "chinese": "股东"
+      },
+      {
+        "english": "supply chain",
+        "chinese": "供应链"
+      },
+      {
+        "english": "entrepreneur",
+        "chinese": "企业家"
+      },
+      {
+        "english": "cyclone",
+        "chinese": "气旋"
+      },
+      {
+        "english": "organization",
+        "chinese": "组织"
+      },
+      {
+        "english": "gene",
+        "chinese": "基因 / 遗传的"
+      },
+      {
+        "english": "genetic",
+        "chinese": "基因 / 遗传的"
+      },
+      {
+        "english": "merger",
+        "chinese": "合并"
+      },
+      {
+        "english": "corporation",
+        "chinese": "公司"
+      },
+      {
+        "english": "coastline",
+        "chinese": "海岸线"
+      },
+      {
+        "english": "asset",
+        "chinese": "资产"
+      },
+      {
+        "english": "corporate culture",
+        "chinese": "企业文化"
+      },
+      {
+        "english": "guarantee",
+        "chinese": "保证"
+      },
+      {
+        "english": "decision-making",
+        "chinese": "决策"
+      },
+      {
+        "english": "competitor",
+        "chinese": "竞争者"
+      },
+      {
+        "english": "appraisal",
+        "chinese": "绩效评估"
+      },
+      {
+        "english": "partner",
+        "chinese": "伙伴；配偶"
+      },
+      {
+        "english": "archipelago",
+        "chinese": "群岛"
+      },
+      {
+        "english": "negotiation",
+        "chinese": "谈判"
+      },
+      {
+        "english": "territory",
+        "chinese": "领地"
+      },
+      {
+        "english": "logistics",
+        "chinese": "物流"
+      },
+      {
+        "english": "delta",
+        "chinese": "三角洲"
+      },
+      {
+        "english": "acquisition",
+        "chinese": "收购"
+      },
+      {
+        "english": "hierarchy",
+        "chinese": "层级制度"
+      },
+      {
+        "english": "canyon",
+        "chinese": "峡谷"
+      },
+      {
+        "english": "business ethics",
+        "chinese": "商业道德"
+      },
+      {
+        "english": "candidate",
+        "chinese": "候选人"
+      },
+      {
+        "english": "quality control",
+        "chinese": "质量控制"
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "title": "第9组（401-450）",
+    "items": [
+      {
+        "english": "population density",
+        "chinese": "人口密度"
+      },
+      {
+        "english": "processes atmosphere",
+        "chinese": "大气圈"
+      },
+      {
+        "english": "flood",
+        "chinese": "洪水"
+      },
+      {
+        "english": "plate tectonics",
+        "chinese": "板块构造论"
+      },
+      {
+        "english": "lineage",
+        "chinese": "世系"
+      },
+      {
+        "english": "pottery",
+        "chinese": "陶器"
+      },
+      {
+        "english": "interpretation oral history",
+        "chinese": "口述史"
+      },
+      {
+        "english": "museum",
+        "chinese": "博物馆"
+      },
+      {
+        "english": "longitude",
+        "chinese": "经度"
+      },
+      {
+        "english": "tsunami",
+        "chinese": "海啸"
+      },
+      {
+        "english": "precipitation",
+        "chinese": "降水"
+      },
+      {
+        "english": "region",
+        "chinese": "区域"
+      },
+      {
+        "english": "ancestor",
+        "chinese": "祖先"
+      },
+      {
+        "english": "empire",
+        "chinese": "帝国"
+      },
+      {
+        "english": "biome",
+        "chinese": "生物群系"
+      },
+      {
+        "english": "descendant",
+        "chinese": "后裔"
+      },
+      {
+        "english": "documentation",
+        "chinese": "档案记录"
+      },
+      {
+        "english": "lithosphere",
+        "chinese": "岩石圈"
+      },
+      {
+        "english": "natural resources",
+        "chinese": "自然资源"
+      },
+      {
+        "english": "tundra",
+        "chinese": "苔原"
+      },
+      {
+        "english": "excavation",
+        "chinese": "发掘"
+      },
+      {
+        "english": "archaeologist",
+        "chinese": "考古学家"
+      },
+      {
+        "english": "hurricane",
+        "chinese": "飓风"
+      },
+      {
+        "english": "prehistory",
+        "chinese": "史前时期"
+      },
+      {
+        "english": "earthquake",
+        "chinese": "地震"
+      },
+      {
+        "english": "erosion",
+        "chinese": "侵蚀"
+      },
+      {
+        "english": "methodology",
+        "chinese": "方法论"
+      },
+      {
+        "english": "excavation tools",
+        "chinese": "发掘工具"
+      },
+      {
+        "english": "excavation site",
+        "chinese": "发掘现场"
+      },
+      {
+        "english": "heritage restoration",
+        "chinese": "修复"
+      },
+      {
+        "english": "medieval",
+        "chinese": "中世纪的"
+      },
+      {
+        "english": "primary source",
+        "chinese": "一手史料"
+      },
+      {
+        "english": "data interpretation",
+        "chinese": "数据解读"
+      },
+      {
+        "english": "science",
+        "chinese": "科学"
+      },
+      {
+        "english": "equator",
+        "chinese": "赤道"
+      },
+      {
+        "english": "monsoon",
+        "chinese": "季风"
+      },
+      {
+        "english": "temperature",
+        "chinese": "温度"
+      },
+      {
+        "english": "humidity",
+        "chinese": "湿度"
+      },
+      {
+        "english": "relic",
+        "chinese": "遗物/圣物"
+      },
+      {
+        "english": "archaeology",
+        "chinese": "考古学"
+      },
+      {
+        "english": "savanna",
+        "chinese": "稀树草原"
+      },
+      {
+        "english": "ceramics",
+        "chinese": "陶瓷器"
+      },
+      {
+        "english": "wetland",
+        "chinese": "湿地"
+      },
+      {
+        "english": "inscription",
+        "chinese": "铭文"
+      },
+      {
+        "english": "typology",
+        "chinese": "类型学"
+      },
+      {
+        "english": "contexts context",
+        "chinese": "背景/语境"
+      },
+      {
+        "english": "civilization",
+        "chinese": "文明"
+      },
+      {
+        "english": "renaissance",
+        "chinese": "文艺复兴"
+      },
+      {
+        "english": "secondary source",
+        "chinese": "二手史料"
+      },
+      {
+        "english": "settlement",
+        "chinese": "聚落"
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "title": "第10组（451-500）",
+    "items": [
+      {
+        "english": "meta-analysis",
+        "chinese": "元分析"
+      },
+      {
+        "english": "conference",
+        "chinese": "学术会议"
+      },
+      {
+        "english": "dissertation",
+        "chinese": "学位论文"
+      },
+      {
+        "english": "result",
+        "chinese": "结果"
+      },
+      {
+        "english": "qualitative research",
+        "chinese": "质性研究"
+      },
+      {
+        "english": "hypothesis testing",
+        "chinese": "假设检验"
+      },
+      {
+        "english": "hypothesis testing",
+        "chinese": "假设检验"
+      },
+      {
+        "english": "statistical analysis",
+        "chinese": "统计分析"
+      },
+      {
+        "english": "overstated",
+        "chinese": "夸张的"
+      },
+      {
+        "english": "phrases laboratory",
+        "chinese": "实验室"
+      },
+      {
+        "english": "conceptual model",
+        "chinese": "概念模型"
+      },
+      {
+        "english": "fieldwork",
+        "chinese": "实地考察"
+      },
+      {
+        "english": "academic article",
+        "chinese": "学术文章"
+      },
+      {
+        "english": "communication abstract",
+        "chinese": "摘要"
+      },
+      {
+        "english": "theoretical framework",
+        "chinese": "理论框架"
+      },
+      {
+        "english": "peer review",
+        "chinese": "同行评审"
+      },
+      {
+        "english": "theoretical research",
+        "chinese": "理论研究"
+      },
+      {
+        "english": "qualitative research",
+        "chinese": "质性研究"
+      },
+      {
+        "english": "survey",
+        "chinese": "问卷调查"
+      },
+      {
+        "english": "pilot study",
+        "chinese": "预实验/试点研究"
+      },
+      {
+        "english": "community",
+        "chinese": "学界"
+      },
+      {
+        "english": "statistical analysis",
+        "chinese": "统计分析"
+      },
+      {
+        "english": "findings",
+        "chinese": "研究发现"
+      },
+      {
+        "english": "academic writing",
+        "chinese": "学术写作"
+      },
+      {
+        "english": "discipline",
+        "chinese": "学科"
+      },
+      {
+        "english": "cross-sectional study",
+        "chinese": "横断面研究"
+      },
+      {
+        "english": "empirical",
+        "chinese": "经验性的"
+      },
+      {
+        "english": "quantitative research",
+        "chinese": "量化研究"
+      },
+      {
+        "english": "methodology",
+        "chinese": "研究方法论"
+      },
+      {
+        "english": "advisor",
+        "chinese": "顾问"
+      },
+      {
+        "english": "mentor",
+        "chinese": "导师"
+      },
+      {
+        "english": "bibliography",
+        "chinese": "参考文献"
+      },
+      {
+        "english": "academic journal",
+        "chinese": "学术期刊"
+      },
+      {
+        "english": "article",
+        "chinese": "文章"
+      },
+      {
+        "english": "literature search",
+        "chinese": "文献检索"
+      },
+      {
+        "english": "results",
+        "chinese": "研究结果"
+      },
+      {
+        "english": "conference",
+        "chinese": "学术会议"
+      },
+      {
+        "english": "relevance",
+        "chinese": "相关性"
+      },
+      {
+        "english": "investigator",
+        "chinese": "研究员"
+      },
+      {
+        "english": "longitudinal study",
+        "chinese": "纵向研究"
+      },
+      {
+        "english": "quantitative research",
+        "chinese": "量化研究"
+      },
+      {
+        "english": "principle",
+        "chinese": "原理"
+      },
+      {
+        "english": "data visualization",
+        "chinese": "数据可视化"
+      },
+      {
+        "english": "hypothesis",
+        "chinese": "假设"
+      },
+      {
+        "english": "control group",
+        "chinese": "对照组"
+      },
+      {
+        "english": "collaboration",
+        "chinese": "合作"
+      },
+      {
+        "english": "output abstract",
+        "chinese": "摘要"
+      },
+      {
+        "english": "discussion",
+        "chinese": "讨论"
+      },
+      {
+        "english": "literature review",
+        "chinese": "文献综述"
+      },
+      {
+        "english": "questionnaire",
+        "chinese": "问卷"
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "title": "第11组（501-523）",
+    "items": [
+      {
+        "english": "register",
+        "chinese": "注册/入学"
+      },
+      {
+        "english": "academic department",
+        "chinese": "学系"
+      },
+      {
+        "english": "punctuation",
+        "chinese": "标点符号"
+      },
+      {
+        "english": "intellectual property",
+        "chinese": "知识产权"
+      },
+      {
+        "english": "ethics",
+        "chinese": "伦理"
+      },
+      {
+        "english": "academic discipline",
+        "chinese": "学科"
+      },
+      {
+        "english": "term",
+        "chinese": "学期"
+      },
+      {
+        "english": "ethics academic integrity",
+        "chinese": "学术诚信"
+      },
+      {
+        "english": "thesis",
+        "chinese": "学位论文"
+      },
+      {
+        "english": "academic support",
+        "chinese": "学术支持"
+      },
+      {
+        "english": "tutorial",
+        "chinese": "辅导课"
+      },
+      {
+        "english": "enroll",
+        "chinese": "注册/入学"
+      },
+      {
+        "english": "academic community",
+        "chinese": "学术界"
+      },
+      {
+        "english": "coursework",
+        "chinese": "课程作业"
+      },
+      {
+        "english": "academic institution",
+        "chinese": "学术机构"
+      },
+      {
+        "english": "academic career",
+        "chinese": "学术生涯"
+      },
+      {
+        "english": "assignment",
+        "chinese": "作业"
+      },
+      {
+        "english": "academic network",
+        "chinese": "学术网络"
+      },
+      {
+        "english": "academic standard",
+        "chinese": "学术标准"
+      },
+      {
+        "english": "semester",
+        "chinese": "学期"
+      },
+      {
+        "english": "peer review",
+        "chinese": "同行评审"
+      },
+      {
+        "english": "mentor",
+        "chinese": "导师"
+      },
+      {
+        "english": "plagiarism",
+        "chinese": "剽窃"
+      }
+    ]
+  }
+];
+    const TEXT = {"page": "听力错词拼写闯关", "headline": "听力错词<br>拼写闯关", "subtitle": "只看中文，拼英文。每个词完整拼对两次才过关；组内顺序已打乱。", "words": "词", "passed": "已过", "per_group": "每组 50 个", "group1": "第1组", "shuffle": "重新打乱本组", "reset_group": "重置本组", "reset_all": "清空全部进度", "input": "输入英文完整拼写", "submit": "提交", "done_title": "本组已过关", "done_desc": "这一组所有词都已经完整拼对两次，可以切下一组了。", "current": "当前词进度", "ok_done": "正确，已过关。", "ok_once": "正确，还需要再拼对 1 次。", "bad": "拼错了，本轮不计，换下一个。", "confirm": "确定清空全部拼写进度吗？"};
+    const STORAGE_KEY = 'ielts-listening-spelling-progress-v2';
+    let activeGroup = 0;
+    let currentItem = null;
+    let localOrder = GROUPS.map(g => g.items.map((_, i) => i));
+    function loadProgress() { try { const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); return saved && typeof saved === 'object' ? saved : {}; } catch { return {}; } }
+    let progress = loadProgress();
+    function saveProgress() { localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); }
+    function showSyncNote(message) {
+      const note = document.getElementById('syncNote');
+      note.textContent = message;
+      clearTimeout(showSyncNote.timer);
+      showSyncNote.timer = setTimeout(() => { note.textContent = ''; }, 4200);
+    }
+    function encodeProgressCode() {
+      const payload = { app: 'ielts-listening-spelling', version: 2, savedAt: new Date().toISOString(), progress };
+      return btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+    }
+    function decodeProgressCode(code) {
+      const payload = JSON.parse(decodeURIComponent(escape(atob(code.trim()))));
+      if (!payload || payload.app !== 'ielts-listening-spelling' || payload.version !== 2 || !payload.progress || typeof payload.progress !== 'object') {
+        throw new Error('invalid progress code');
+      }
+      const cleaned = {};
+      Object.entries(payload.progress).forEach(([key, value]) => {
+        if (/^\d+:\d+$/.test(key)) cleaned[key] = Math.min(2, Math.max(0, Number(value) || 0));
+      });
+      return cleaned;
+    }
+    function keyOf(groupIndex, itemIndex) { return `${groupIndex}:${itemIndex}`; }
+    function countOf(groupIndex, itemIndex) { return Math.min(2, progress[keyOf(groupIndex, itemIndex)] || 0); }
+    function setCount(groupIndex, itemIndex, value) { progress[keyOf(groupIndex, itemIndex)] = Math.min(2, Math.max(0, value)); saveProgress(); }
+    function normalizeAnswer(value) { return value.trim().replace(/\s+/g, ' ').toLowerCase(); }
+    function shuffleArray(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } }
+    function groupStats(groupIndex) { const items = GROUPS[groupIndex].items; const points = items.reduce((sum, _, i) => sum + countOf(groupIndex, i), 0); return { done: items.filter((_, i) => countOf(groupIndex, i) >= 2).length, total: items.length, points, max: items.length * 2 }; }
+    function allDone() { return GROUPS.reduce((sum, g, gi) => sum + g.items.filter((_, ii) => countOf(gi, ii) >= 2).length, 0); }
+    function renderGroups() {
+      const list = document.getElementById('groupList'); list.innerHTML = '';
+      GROUPS.forEach((group, gi) => {
+        const stats = groupStats(gi); const btn = document.createElement('button'); btn.type = 'button'; btn.className = `group-btn ${gi === activeGroup ? 'active' : ''} ${stats.done === stats.total ? 'done' : ''}`;
+        btn.innerHTML = `<div class="group-title"><span>${group.title}</span><span>${stats.done}/${stats.total}</span></div><div class="group-progress"><span style="width:${Math.round(stats.points / stats.max * 100)}%"></span></div>`;
+        btn.addEventListener('click', () => { activeGroup = gi; pickNext(true); render(); }); list.appendChild(btn);
+      });
+      document.getElementById('doneStat').textContent = `${TEXT.passed} ${allDone()} / 523`;
+    }
+    function pickNext(force = false) {
+      const group = GROUPS[activeGroup]; if (!force && currentItem && countOf(activeGroup, currentItem.index) < 2) return;
+      const available = localOrder[activeGroup].filter(i => countOf(activeGroup, i) < 2); if (!available.length) { currentItem = null; return; }
+      const nextIndex = available[0]; localOrder[activeGroup] = localOrder[activeGroup].filter(i => i !== nextIndex).concat(nextIndex); currentItem = { ...group.items[nextIndex], index: nextIndex };
+    }
+    function renderQuiz() {
+      const area = document.getElementById('quizArea'); const group = GROUPS[activeGroup]; const stats = groupStats(activeGroup); document.getElementById('activeTitle').textContent = group.title;
+      if (!currentItem) pickNext(true);
+      if (!currentItem) { area.innerHTML = `<div class="empty"><h2>${TEXT.done_title}</h2><p>${TEXT.done_desc}</p></div>`; return; }
+      const count = countOf(activeGroup, currentItem.index);
+      area.innerHTML = `<div class="question"><div class="count">${TEXT.current}?${count} / 2</div><div class="zh">${currentItem.chinese}</div></div><form class="input-row" id="answerForm" autocomplete="off"><input id="answerInput" name="answer" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${TEXT.input}"><button class="submit" type="submit">${TEXT.submit}</button></form><div class="feedback" id="feedback"></div><div class="progress-strip"><div class="bar"><span style="width:${Math.round(stats.points / stats.max * 100)}%"></span></div><div class="word-grid">${group.items.map((_, i) => `<div class="dot ${countOf(activeGroup, i) === 1 ? 'one' : countOf(activeGroup, i) >= 2 ? 'two' : ''}">${countOf(activeGroup, i)}/2</div>`).join('')}</div></div>`;
+      const input = document.getElementById('answerInput'); input.focus();
+      document.getElementById('answerForm').addEventListener('submit', event => {
+        event.preventDefault(); const feedback = document.getElementById('feedback'); const answer = normalizeAnswer(input.value);
+        if (answer === currentItem.english) { const nextCount = countOf(activeGroup, currentItem.index) + 1; setCount(activeGroup, currentItem.index, nextCount); feedback.textContent = nextCount >= 2 ? TEXT.ok_done : TEXT.ok_once; feedback.className = 'feedback ok'; input.value = ''; setTimeout(() => { pickNext(true); render(); }, 420); }
+        else { feedback.textContent = TEXT.bad; feedback.className = 'feedback bad'; input.disabled = true; setTimeout(() => { pickNext(true); render(); }, 650); }
+      });
+    }
+    function render() { renderGroups(); renderQuiz(); }
+    document.getElementById('shuffleBtn').addEventListener('click', () => { shuffleArray(localOrder[activeGroup]); pickNext(true); render(); });
+    document.getElementById('exportBtn').addEventListener('click', async () => {
+      const code = encodeProgressCode();
+      try {
+        await navigator.clipboard.writeText(code);
+        showSyncNote('进度码已复制，去另一台设备点“导入进度”粘贴即可。');
+      } catch {
+        prompt('复制下面这段进度码，到另一台设备导入：', code);
+        showSyncNote('如果没有自动复制，请手动复制弹窗里的进度码。');
+      }
+    });
+    document.getElementById('importBtn').addEventListener('click', () => {
+      const code = prompt('粘贴从另一台设备导出的进度码：');
+      if (!code) return;
+      try {
+        progress = decodeProgressCode(code);
+        saveProgress();
+        currentItem = null;
+        pickNext(true);
+        render();
+        showSyncNote('进度已导入。');
+      } catch {
+        showSyncNote('导入失败：进度码格式不对。');
+      }
+    });
+    document.getElementById('resetGroupBtn').addEventListener('click', () => { GROUPS[activeGroup].items.forEach((_, i) => delete progress[keyOf(activeGroup, i)]); saveProgress(); pickNext(true); render(); });
+    document.getElementById('resetAllBtn').addEventListener('click', () => { if (!confirm(TEXT.confirm)) return; progress = {}; saveProgress(); pickNext(true); render(); });
+    render();
+  </script>
+</body>
+</html>
